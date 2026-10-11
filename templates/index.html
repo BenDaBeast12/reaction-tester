@@ -4,16 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <meta name="description" content="Test your reaction speed with this free online reaction time tester. Measure your reaction time in milliseconds and beat your personal best.">
+
     <title>Reaction Time Tester</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="icon" type="image/svg+xml"
+          href="{{ url_for('static', filename='logo.svg') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <main class="container">
-        <h1>Reaction Time Tester</h1>
+
+        <div class="brand">
+            <img src="{{ url_for('static', filename='logo.svg') }}"
+                 alt="Reaction Time Tester logo"
+                 class="logo">
+            <h1>Reaction Time Tester</h1>
+        </div>
+
         <p class="subtitle">How fast are your reactions?</p>
 
-        <div id="game" class="game waiting" role="button" tabindex="0" aria-label="Reaction time test area">
+        <div id="game" class="game waiting"
+             role="button" tabindex="0"
+             aria-label="Reaction time test area">
             <span id="message">Press Start to begin</span>
         </div>
 
@@ -24,14 +40,20 @@
                 <span class="label">Your reaction</span>
                 <strong id="result">-- ms</strong>
             </div>
+
             <div class="result-card">
                 <span class="label">Personal best</span>
                 <strong id="best">-- ms</strong>
             </div>
         </section>
 
-        <p id="hint">Wait for the area to turn green, then click as quickly as possible.</p>
-        <p class="note">Your personal best is saved in this browser.</p>
+        <p id="hint">
+            Wait for the area to turn green, then click as quickly as possible.
+        </p>
+
+        <p class="note">
+            Your personal best is saved in this browser.
+        </p>
     </main>
 
     <script>
@@ -47,19 +69,12 @@
         let startTime = 0;
         let best = Number(localStorage.getItem("reactionBest")) || null;
 
-        bestDisplay.textContent = best === null ? "-- ms" : best + " ms";
-
-        function resetGame() {
-            clearTimeout(timeoutId);
-            state = "idle";
-            game.className = "game waiting";
-            message.textContent = "Press Start to begin";
-            startButton.disabled = false;
-            startButton.textContent = "Start Test";
-        }
+        bestDisplay.textContent =
+            best === null ? "-- ms" : best + " ms";
 
         function startTest() {
             clearTimeout(timeoutId);
+
             state = "waiting";
             game.className = "game waiting";
             message.textContent = "Wait for green...";
@@ -87,13 +102,17 @@
                 hint.textContent = "Wait until the area turns green. Try again.";
                 startButton.disabled = false;
                 startButton.textContent = "Try Again";
+
             } else if (state === "ready") {
-                const reaction = Math.round(performance.now() - startTime);
+                const reaction =
+                    Math.round(performance.now() - startTime);
+
                 state = "finished";
                 game.className = "game finished";
                 message.textContent = reaction + " ms";
                 resultDisplay.textContent = reaction + " ms";
-                hint.textContent = "Test again to try to beat your personal best.";
+                hint.textContent =
+                    "Test again to try to beat your personal best.";
 
                 if (best === null || reaction < best) {
                     best = reaction;
