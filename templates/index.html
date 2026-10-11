@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="google-site-verification" content="5iMg0IsWd16Ain6f7A1289I_mOG8PaDKDfBjyF7uig4" />
+
     <meta name="description" content="Test your reaction speed with this free online reaction time tester. Measure your reaction time in milliseconds and beat your personal best.">
 
     <title>Reaction Time Tester</title>
@@ -15,6 +17,7 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <main class="container">
 
@@ -28,7 +31,8 @@
         <p class="subtitle">How fast are your reactions?</p>
 
         <div id="game" class="game waiting"
-             role="button" tabindex="0"
+             role="button"
+             tabindex="0"
              aria-label="Reaction time test area">
             <span id="message">Press Start to begin</span>
         </div>
@@ -54,6 +58,7 @@
         <p class="note">
             Your personal best is saved in this browser.
         </p>
+
     </main>
 
     <script>
@@ -67,6 +72,7 @@
         let state = "idle";
         let timeoutId = null;
         let startTime = 0;
+
         let best = Number(localStorage.getItem("reactionBest")) || null;
 
         bestDisplay.textContent =
@@ -80,6 +86,7 @@
             message.textContent = "Wait for green...";
             resultDisplay.textContent = "-- ms";
             hint.textContent = "Don't click until the area turns green!";
+
             startButton.disabled = true;
             startButton.textContent = "Test running";
 
@@ -96,10 +103,13 @@
         function handleClick() {
             if (state === "waiting") {
                 clearTimeout(timeoutId);
+
                 state = "early";
                 game.className = "game early";
                 message.textContent = "Too early!";
-                hint.textContent = "Wait until the area turns green. Try again.";
+                hint.textContent =
+                    "Wait until the area turns green. Try again.";
+
                 startButton.disabled = false;
                 startButton.textContent = "Try Again";
 
@@ -111,11 +121,13 @@
                 game.className = "game finished";
                 message.textContent = reaction + " ms";
                 resultDisplay.textContent = reaction + " ms";
+
                 hint.textContent =
                     "Test again to try to beat your personal best.";
 
                 if (best === null || reaction < best) {
                     best = reaction;
+
                     localStorage.setItem("reactionBest", best);
                     bestDisplay.textContent = best + " ms";
                     hint.textContent = "New personal best!";
