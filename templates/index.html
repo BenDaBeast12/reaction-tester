@@ -1,1 +1,121 @@
-<!-- Reaction Time Tester HTML -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Test your reaction speed with this free online reaction time tester. Measure your reaction time in milliseconds and beat your personal best.">
+    <title>Reaction Time Tester</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <h1>Reaction Time Tester</h1>
+        <p class="subtitle">How fast are your reactions?</p>
+
+        <div id="game" class="game waiting" role="button" tabindex="0" aria-label="Reaction time test area">
+            <span id="message">Press Start to begin</span>
+        </div>
+
+        <button id="start">Start Test</button>
+
+        <section class="results" aria-live="polite">
+            <div class="result-card">
+                <span class="label">Your reaction</span>
+                <strong id="result">-- ms</strong>
+            </div>
+            <div class="result-card">
+                <span class="label">Personal best</span>
+                <strong id="best">-- ms</strong>
+            </div>
+        </section>
+
+        <p id="hint">Wait for the area to turn green, then click as quickly as possible.</p>
+        <p class="note">Your personal best is saved in this browser.</p>
+    </main>
+
+    <script>
+        const game = document.getElementById("game");
+        const message = document.getElementById("message");
+        const startButton = document.getElementById("start");
+        const resultDisplay = document.getElementById("result");
+        const bestDisplay = document.getElementById("best");
+        const hint = document.getElementById("hint");
+
+        let state = "idle";
+        let timeoutId = null;
+        let startTime = 0;
+        let best = Number(localStorage.getItem("reactionBest")) || null;
+
+        bestDisplay.textContent = best === null ? "-- ms" : best + " ms";
+
+        function resetGame() {
+            clearTimeout(timeoutId);
+            state = "idle";
+            game.className = "game waiting";
+            message.textContent = "Press Start to begin";
+            startButton.disabled = false;
+            startButton.textContent = "Start Test";
+        }
+
+        function startTest() {
+            clearTimeout(timeoutId);
+            state = "waiting";
+            game.className = "game waiting";
+            message.textContent = "Wait for green...";
+            resultDisplay.textContent = "-- ms";
+            hint.textContent = "Don't click until the area turns green!";
+            startButton.disabled = true;
+            startButton.textContent = "Test running";
+
+            const delay = 2000 + Math.random() * 4000;
+
+            timeoutId = setTimeout(() => {
+                state = "ready";
+                game.className = "game ready";
+                message.textContent = "CLICK NOW!";
+                startTime = performance.now();
+            }, delay);
+        }
+
+        function handleClick() {
+            if (state === "waiting") {
+                clearTimeout(timeoutId);
+                state = "early";
+                game.className = "game early";
+                message.textContent = "Too early!";
+                hint.textContent = "Wait until the area turns green. Try again.";
+                startButton.disabled = false;
+                startButton.textContent = "Try Again";
+            } else if (state === "ready") {
+                const reaction = Math.round(performance.now() - startTime);
+                state = "finished";
+                game.className = "game finished";
+                message.textContent = reaction + " ms";
+                resultDisplay.textContent = reaction + " ms";
+                hint.textContent = "Test again to try to beat your personal best.";
+
+                if (best === null || reaction < best) {
+                    best = reaction;
+                    localStorage.setItem("reactionBest", best);
+                    bestDisplay.textContent = best + " ms";
+                    hint.textContent = "New personal best!";
+                }
+
+                startButton.disabled = false;
+                startButton.textContent = "Try Again";
+            }
+        }
+
+        startButton.addEventListener("click", startTest);
+        game.addEventListener("click", handleClick);
+
+        game.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                handleClick();
+            }
+        });
+    </script>
+</body>
+</html>
